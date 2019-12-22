@@ -1,0 +1,26 @@
+`timescale 1ns / 1ps
+
+module b_reg2
+	(
+	input wire b_clr2,
+	input wire b_ld2,
+	input wire b2, 
+	input wire clk,
+	
+	output reg b_reg2
+   );
+	
+	
+	always@(posedge clk) begin
+		if(b_clr2)begin
+			b_reg2 = 0;
+		end
+		else if(b_ld2) begin
+			b_reg2 = b_reg2 + b2;
+		end
+		else begin
+			b_reg2 = b_reg2;
+		end
+	end
+
+endmodule
