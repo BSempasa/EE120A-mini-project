@@ -1,0 +1,74 @@
+`timescale 1ns / 1ps
+
+module crosswalk_datapath(
+	input wire s0,
+	input wire [31:0] cnt_ini,   
+	input wire reset,
+	input wire clk,
+	input wire b_clr1,
+	input wire b_ld1,
+	input wire b1,
+	input wire b_clr2,
+	input wire b_ld2,
+	input wire b2,
+	
+	output wire timer,
+	output wire b_reg1,
+	output wire b_reg2
+    );
+	 
+	 reg [31:0] t3 = 32'h8f0d180;
+	 reg [31:0] t5 = 32'hee6b280;
+	 wire[31:0] cnt_rst;
+	
+	// -------------------------------------- 
+	// B_reg1 
+	// ---------------------------------------
+	b_reg1 breg1(
+		.b_clr1(b_clr1),
+		.b_ld1(b_ld1),
+		.b1(b1),
+		.clk(clk),
+	
+		.b_reg1(b_reg1)
+		);
+		
+	// -------------------------------------- 
+	// B_reg2 
+	// ---------------------------------------
+	b_reg2 breg2(
+		.b_clr2(b_clr2),
+		.b_ld2(b_ld2),
+		.b2(b2),
+		.clk(clk),
+	
+		.b_reg2(b_reg2)
+		);
+	
+	// -------------------------------------- 
+	// MUX
+	// -------------------------------------- 
+	crosswalk_mux crosswalkmux(
+		.s0(s0),
+		.t3(t3),
+		.t5(t5),
+		
+		.cnt_rst(cnt_rst)
+		);
+	 
+	// -------------------------------------- 
+	// Timer instantiation  
+	// -------------------------------------- 
+ 
+	timer_bh timerbh(   
+			.reset(reset),
+			.clk(clk),
+			.cnt_ini(cnt_ini),
+			.cnt_rst(cnt_rst),
+			.timer(timer)
+		);   
+ 
+	 
+
+
+endmodule
