@@ -1,0 +1,70 @@
+`timescale 1ns / 1ps
+
+module crosswalk (  
+		input wire b1,
+		input wire b2,
+		input wire clk,  
+	
+		output wire light1,
+		output wire light2,
+		output wire light_w,
+		output wire light_t1,
+		output wire light_t2
+		); 
+	
+		//internal wires
+		wire s0;
+		wire [31:0] cnt_ini;
+		wire reset;
+		wire b_clr1; 
+		wire b_ld1; 
+		wire b_clr2; 
+		wire b_ld2; 
+		wire timer;
+		wire b_reg1;
+		wire b_reg2;
+		
+   crosswalk_controller crosswalkcontroller(
+				.clk(clk), 					
+				.timer(timer),				
+				.b_reg1(b_reg1),
+				.b_reg2(b_reg2),
+				
+				.cnt_ini(cnt_ini),		
+				.reset(reset),				
+				.b_clr1(b_clr1),				
+				.b_ld1(b_ld1),
+				.b_clr2(b_clr2),				
+				.b_ld2(b_ld2),
+				.s0(s0),						
+				
+				.light1(light1),			
+				.light2(light2),			
+				.light_w(light_w),
+				.light_t1(light_t1),
+				.light_t2(light_t2)
+			);
+      
+	 crosswalk_datapath crosswalkdatapath(
+			.s0(s0),							
+			.cnt_ini(cnt_ini),			
+			.reset(reset),					
+			.clk(clk),						
+			.b_clr1(b_clr1),					
+			.b_ld1(b_ld1),
+			.b_clr2(b_clr2),					
+			.b_ld2(b_ld2),
+			.b1(b1),
+			.b2(b2),
+		
+			.b_reg1(b_reg1),	
+			.b_reg2(b_reg2),	
+			.timer(timer)					
+		);
+		
+	
+endmodule
+
+
+
+
