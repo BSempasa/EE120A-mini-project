@@ -1,6 +1,6 @@
 # EE120A-mini-project
 # Creators: Brittiney Sempasa and Ruth Navarette
-Four our mini project we were required to create a four way cross-walk
+For our mini project we were required to create a four way cross-walk
 which would recieve user input by way of a button to allow that user 
 to cross the street. 
 
