@@ -1,0 +1,31 @@
+`timescale 1ns / 1ps
+
+
+module timer_bh (
+			input wire clk,    
+			input wire reset,    
+			input wire [31:0] cnt_ini,    
+			input wire [31:0] cnt_rst,
+			
+			output reg timer
+    );
+	
+	reg [31:0] count = 32'h0000;
+
+	always@(posedge clk) begin
+	if(reset)begin
+		count = cnt_ini;
+		timer = 1'b0;
+	end
+	else if (count == cnt_rst) begin
+		count = cnt_ini;
+		timer = 1'b1;  
+	end
+	else begin
+		count = count + 1;
+		timer = 1'b0;
+	end
+	
+	end
+
+endmodule
