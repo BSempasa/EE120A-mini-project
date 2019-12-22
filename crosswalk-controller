@@ -1,0 +1,246 @@
+`timescale 1ns / 1ps
+
+module crosswalk_controller(
+	input wire clk,
+	input wire b_reg1,
+	input wire b_reg2,
+	input wire timer,
+	
+	output reg s0,
+	output reg [31:0] cnt_ini = 32'h0000,
+	output reg reset,
+	output reg b_clr1,
+	output reg b_ld1,
+	output reg b_clr2,
+	output reg b_ld2,
+	
+	
+	output reg light1,
+	output reg light2,
+	output reg light_w,
+	output reg light_t1,
+	output reg light_t2
+	 );
+	
+	reg [3:0] current_state;  
+	reg [3:0] next_state;
+
+	
+	// -------------------------------------- 
+	// Sequential logic  
+	// -------------------------------------- 
+	 
+	always @(posedge clk) begin  
+		current_state <= next_state ;  
+	end 
+	
+	// -------------------------------------- 
+	// Comb. Logic - FSM   
+	// -------------------------------------- 
+ 
+	localparam START   = 4'b0000;  
+	localparam P1_INIT = 4'b0001;  
+	localparam P1_ON = 4'b0010;  
+	localparam P2_INIT = 4'b0011;
+	localparam P2_ON = 4'b0100; 
+	localparam WALK_INIT_1 = 4'b0101;
+	localparam WALK_ON_1 = 4'b0110;
+	localparam WALK_INIT_2 = 4'b0111;
+	localparam WALK_ON_2 = 4'b1000;
+	
+	always @( current_state ) begin  
+ 
+		case (current_state)
+		
+		START :  begin
+			light1 = 1'b0;
+			light2 = 1'b0;
+			light_w = 1'b0;
+			light_t1 = 1'b0;
+			light_t2 = 1'b0;
+			s0 = 1'b0;
+			reset = 1'b1;
+			b_clr1 = 1'b1;
+			b_ld1 = 1'b0;
+			b_clr2 = 1'b1;
+			b_ld2 = 1'b0;
+			next_state = P1_INIT;
+		end 
+		
+		P1_INIT : begin
+			light1 = 1'b0;
+			light2 = 1'b0;
+			light_w = 1'b0;
+			light_t1 = 1'b0;
+			light_t2 = 1'b0;
+			s0 = 1'b0;
+			reset = 1'b1;
+			b_clr1 = 1'b1;
+			b_ld1 = 1'b0;
+			b_clr2 = 1'b1;
+			b_ld2 = 1'b0;
+			
+			next_state = P1_ON;
+		end 
+
+		P1_ON : begin 
+			light1 = 1'b1;
+			light2 = 1'b0;
+			light_w = 1'b0;
+			light_t1 = 1'b0;
+			light_t2 = 1'b0;
+			s0 = 1'b0;
+			reset = 1'b0;
+			b_clr1 = 1'b0;
+			b_ld1 = 1'b1;
+			b_clr2 = 1'b0;
+			b_ld2 = 1'b1;
+				if(timer&&~b_reg1&&~b_reg2) begin
+					next_state = P2_INIT;
+				end
+				else if (timer&&b_reg1&&~b_reg2) begin
+					next_state = WALK_INIT_1;
+					end
+				else if (timer&&~b_reg1&&b_reg2) begin
+					next_state = WALK_INIT_2;
+					end
+				else begin
+					next_state = P1_ON;
+				end
+		end
+	
+		P2_INIT : begin
+			light1 = 1'b0;
+			light2 = 1'b0;
+			light_w = 1'b0;
+			light_t1 = 1'b0;
+			light_t2 = 1'b0;
+			s0 = 1'b0;
+			reset = 1'b1;
+			b_clr1 = 1'b1;
+			b_ld1 = 1'b0;
+			b_clr2 = 1'b1;
+			b_ld2 = 1'b0;
+			next_state = P2_ON;
+		
+		end
+		
+		
+		P2_ON : begin
+			light1 = 1'b0;
+			light2 = 1'b1;
+			light_w = 1'b0;
+			light_t1 = 1'b0;
+			light_t2 = 1'b0;
+			s0 = 1'b0;
+			reset = 1'b0;
+			b_clr1 = 1'b0;
+			b_ld1 = 1'b1;
+			b_clr2 = 1'b0;
+			b_ld2 = 1'b1;
+				if(timer&&~b_reg1&&~b_reg2) begin
+					next_state = P1_INIT;
+				end
+				else if (timer&&b_reg1&&~b_reg2) begin
+					next_state = WALK_INIT_1;
+					end
+				else if (timer&&~b_reg1&&b_reg2) begin
+					next_state = WALK_INIT_2;
+					end
+				else begin
+					next_state = P2_ON;
+				end
+		
+		end
+		
+		WALK_INIT_1 : begin
+			light1 = 1'b0;
+			light2 = 1'b0;
+			light_w = 1'b0;
+			light_t1 = 1'b0;
+			light_t2 = 1'b0;
+			s0 = 1'b1;
+			reset = 1'b1;
+			b_clr1 = 1'b1;
+			b_ld1 = 1'b0;
+			b_clr2 = 1'b1;
+			b_ld2 = 1'b0;
+			next_state = WALK_ON_1;
+		end
+		
+		WALK_ON_1 : begin
+			light1 = 1'b0;
+			light2 = 1'b0;
+			light_w = 1'b1;
+			light_t1 = 1'b1;
+			light_t2 = 1'b0;
+			s0 = 1'b1;
+			reset = 1'b0;
+			b_clr1 = 1'b0;
+			b_ld1 = 1'b1;
+			b_clr2 = 1'b0;
+			b_ld2 = 1'b1;
+			if (timer) begin
+				next_state = P1_INIT;
+			end
+			else begin 
+				next_state = WALK_ON_1;
+			end
+		end
+		
+		WALK_INIT_2 : begin
+			light1 = 1'b0;
+			light2 = 1'b0;
+			light_w = 1'b0;
+			light_t1 = 1'b0;
+			light_t2 = 1'b0;
+			s0 = 1'b1;
+			reset = 1'b1;
+			b_clr1 = 1'b1;
+			b_ld1 = 1'b0;
+			b_clr2 = 1'b1;
+			b_ld2 = 1'b0;
+			next_state = WALK_ON_2;
+		end
+		
+		WALK_ON_2 : begin
+			light1 = 1'b0;
+			light2 = 1'b0;
+			light_w = 1'b1;
+			light_t1 = 1'b0;
+			light_t2 = 1'b1;
+			s0 = 1'b1;
+			reset = 1'b0;
+			b_clr1 = 1'b0;
+			b_ld1 = 1'b1;
+			b_clr2 = 1'b0;
+			b_ld2 = 1'b1;
+			if (timer) begin
+				next_state = P1_INIT;
+			end
+			else begin 
+				next_state = WALK_ON_2;
+			end
+		end
+		
+
+		default: begin
+			light1 = 1'b0;
+			light2 = 1'b0;
+			light_w = 1'b0;
+			light_t1 = 1'b0;
+			light_t2 = 1'b0;
+			s0 = 1'b0;
+			reset = 1'b1;
+			b_clr1 = 1'b1;
+			b_ld1 = 1'b0;
+			b_clr2 = 1'b1;
+			b_ld2 = 1'b0;
+			next_state = P1_INIT;
+		end
+		
+	endcase
+	end
+
+endmodule
+
